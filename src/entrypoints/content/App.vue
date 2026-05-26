@@ -4,15 +4,51 @@ import { ref, onMounted, onUnmounted, reactive } from 'vue';
 import YouglishIcon from "../../assets/youglish.ico";
 import CambridgeIcon from "../../assets/cambridge.ico";
 import GoogleIcon from "../../assets/google.ico";
+import MerriamIcon from "../../assets/merriam.ico";
+import DictionaryIcon from "../../assets/dictionary.ico";
+import ThesaurusIcon from "../../assets/thesaurus.ico";
+import VocabularyIcon from "../../assets/vocabulary.png";
 
 const buttons = [
+    {
+        tooltip: "Dictionary.com",
+        icon: DictionaryIcon,
+        getUrl(): URL {
+            const url = new URL(toKebabCase(selectedText.value), "https://www.dictionary.com/browse/");
+            return url;
+        }
+    },
+    {
+        tooltip: "Thesaurus.com",
+        icon: ThesaurusIcon,
+        getUrl(): URL {
+            const url = new URL(toKebabCase(selectedText.value), "https://www.thesaurus.com/browse/");
+            return url;
+        }
+    },
+    {
+        tooltip: "Vocabulary.com",
+        icon: VocabularyIcon,
+        getUrl(): URL {
+            const url = new URL(trimAllSpace(selectedText.value).toLowerCase(), "https://www.vocabulary.com/dictionary/");
+            return url;
+        }
+    },
+    {
+        tooltip: "Merriam Webster",
+        icon: MerriamIcon,
+        getUrl(): URL {
+            const url = new URL(trimAllSpace(selectedText.value).toLowerCase(), "https://www.merriam-webster.com/dictionary/");
+            return url;
+        }
+    },
     {
         tooltip: "YouGlish",
         icon: YouglishIcon,
         getUrl(): URL {
             const value = toSnakeCase(selectedText.value) + "/english/us";
             const url = new URL(value, "https://youglish.com/pronounce/");
-return url;
+            return url;
         }
     },
     {
@@ -40,11 +76,24 @@ const menuStyle = reactive({
     left: '0px'
 });
 
+function toKebabCase(str: string): string {
+    return str
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, '-');
+}
+
 function toSnakeCase(str: string): string {
     return str
         .trim()                  // Removes leading and trailing spaces
         .toLowerCase()           // Converts to lowercase
         .replace(/\s+/g, '_');   // Replaces one or more spaces with a single underscore
+}
+
+function trimAllSpace(str: string): string {
+    return str
+        .trim()
+        .replace(/\s+/g, ' ');
 }
 
 function handleMouseUp() {
@@ -109,7 +158,7 @@ onUnmounted(() => {
 
 <template>
     <div v-if="isVisible" class="floating-menu" :style="{ top: menuStyle.top, left: menuStyle.left }">
-        <button v-for="item in buttons" :title="item.tooltip"  @click="handleAction(item.getUrl())">
+        <button v-for="item in buttons" :title="item.tooltip" @click="handleAction(item.getUrl())">
             <img :src="item.icon" width="20" height="20">
         </button>
     </div>
