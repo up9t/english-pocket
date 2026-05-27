@@ -6,6 +6,6 @@ export default defineConfig({
   srcDir: 'src',
   outDir: 'dist',
   manifest: {
-    permissions: ["tabs"],
+    permissions: ["tabs", "storage"],
   },
 });

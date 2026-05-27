@@ -1,7 +1,15 @@
-# WXT + Vue 3
+# English Pocket
 
-This template should help get you started developing with Vue 3 in WXT.
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/P6Q320A43K)
 
-## Recommended IDE Setup
+# How to build
 
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar).
+```bash
+# chromium
+npm run build 
+
+# firefox
+npm run build:firefox
+```
+
+You will see the output in the `dist/` directory.

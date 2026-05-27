@@ -129,7 +129,7 @@ function debounce(func: (...args: any[]) => void, delay: number) {
     }
 }
 
-function handleAction(url: URL) {
+async function handleAction(url: URL) {
     const window: Browser.windows.CreateData = {
         url: url.href,
         focused: true,
@@ -138,13 +138,25 @@ function handleAction(url: URL) {
         type: "popup",
     };
 
-    browser.runtime.sendMessage({
+    await browser.runtime.sendMessage({
         type: "open_new_window",
         data: window
-    });
+    }).catch(console.error);
 
     isVisible.value = false;
-    getSelection()?.empty();
+
+    const isAutoHideSelection = await storage.getItem("local:is_auto_hide_selection", {
+        defaultValue: true,
+    }).catch(err => err);
+
+    if (isAutoHideSelection instanceof Error) {
+        console.error(isAutoHideSelection);
+        return;
+    }
+
+    if (isAutoHideSelection) {
+        getSelection()?.empty();
+    }
 };
 
 onMounted(() => {
@@ -157,10 +169,14 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div v-if="isVisible" class="floating-menu" :style="{ top: menuStyle.top, left: menuStyle.left }">
-        <button v-for="item in buttons" :title="item.tooltip" @click="handleAction(item.getUrl())">
-            <img :src="item.icon" width="20" height="20">
-        </button>
+    <div id="english-pocket-container" v-if="isVisible" class="floating-menu" :style="{ top: menuStyle.top, left: menuStyle.left }">
+        <v-tooltip v-for="(item, index) in buttons" :key="index" :text="item.tooltip" location="bottom">
+            <template #activator="{ props }">
+                <v-btn v-bind="props" icon variant="tonal" density="comfortable" @click="handleAction(item.getUrl())">
+                    <v-img :src="item.icon" width="24" height="24" />
+                </v-btn>
+            </template>
+        </v-tooltip>
     </div>
 </template>
 
@@ -172,6 +188,7 @@ onUnmounted(() => {
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     display: flex;
+    background-color: snow;
     gap: 4px;
     padding: 6px;
     z-index: 999999;

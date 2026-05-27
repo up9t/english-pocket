@@ -1,30 +1,41 @@
 <script lang="ts" setup>
-import HelloWorld from '@/components/HelloWorld.vue';
+import { mdiGithub, mdiInformationOutline } from '@mdi/js';
+
+const isAutoHideSelection = ref<boolean>(true);
+const githubLink = "https://github.com/up9t/english-pocket";
+const kofiDonationLink = "https://ko-fi.com/P6Q320A43K"
+
+watch(isAutoHideSelection, async (newValue) => {
+  await storage.setItem("local:is_auto_hide_selection", newValue)
+    .catch(console.error);
+});
+
+onMounted(async () => {
+  console.log(storage);
+  if (storage) {
+    const result = await storage.getItem('local:is_auto_hide_selection', {
+      defaultValue: isAutoHideSelection.value,
+    }) as boolean;
+
+    isAutoHideSelection.value = result;
+  }
+})
 </script>
 
 <template>
-  <div>
-    <a href="https://wxt.dev" target="_blank">
-      <img src="/wxt.svg" class="logo" alt="WXT logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="@/assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
-  </div>
-  <HelloWorld msg="asdf"/>
+  <header>
+    <h1 class="text-headline-large">English Pocket</h1>
+  </header>
+  <v-divider :thickness="3"></v-divider>
+  <main>
+    <v-switch v-model="isAutoHideSelection" color="primary" label="Auto hide selection"></v-switch>
+  </main>
+  <v-divider :thickness="3"></v-divider>
+  <footer>
+    <v-btn :href="githubLink" :prependIcon="mdiGithub">Github</v-btn>
+    <v-btn :href='kofiDonationLink' target='_blank'><img height='36' style='border:0px;height:36px;'
+        src='https://storage.ko-fi.com/cdn/kofi2.png?v=6' border='0' alt='Buy Me a Coffee at ko-fi.com' /></v-btn>
+  </footer>
 </template>
 
-<style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #54bc4ae0);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
-}
-</style>
+<style scoped></style>
