@@ -1,6 +1,6 @@
 {
-  "name": "wxt-vue-starter",
-  "description": "manifest.json description",
+  "name": "english-pocket",
+  "description": "Easy way to learn new english words with popup buttons.",
   "private": true,
   "version": "0.0.0",
   "type": "module",

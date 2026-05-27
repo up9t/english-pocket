@@ -97,6 +97,7 @@ function trimAllSpace(str: string): string {
 }
 
 function handleMouseUp() {
+    console.log("is it up");
     const selection = getSelection();
 
     if (!selection || selection.isCollapsed) {
