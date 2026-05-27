@@ -69,6 +69,7 @@ const buttons = [
         }
     },
 ];
+const menuElement = ref<HTMLDivElement | null>(null);
 const isVisible = ref(false);
 const selectedText = ref('');
 const menuStyle = reactive({
@@ -96,40 +97,59 @@ function trimAllSpace(str: string): string {
         .replace(/\s+/g, ' ');
 }
 
-function handleMouseUp() {
-    console.log("is it up");
+function getTextSelection(): [string, Selection | null] {
     const selection = getSelection();
 
-    if (!selection || selection.isCollapsed) {
-        isVisible.value = false;
-        return;
+    if (selection === null || selection.isCollapsed) {
+        return ["", null];
     }
 
     const text = selection.toString().trim();
-    if (text.length === 0) {
-        isVisible.value = false;
-        return;
-    }
 
-    selectedText.value = text;
+    return [text, selection];
+}
 
+function showMenu(selection: Selection) {
     const range = selection.getRangeAt(0);
     const rect = range.getBoundingClientRect();
 
     menuStyle.left = `${rect.left + (rect.width / 2)}px`;
     menuStyle.top = `${rect.bottom + 10}px`;
     isVisible.value = true;
-};
-
-function debounce(func: (...args: any[]) => void, delay: number) {
-    let timeoutID: NodeJS.Timeout;
-    return function (...args: any[]) {
-        clearTimeout(timeoutID);
-
-        timeoutID = setInterval(() => func.apply(this, args), delay);
-    }
 }
 
+let timeoutID: NodeJS.Timeout;
+
+function handleGlobalMouseUp() {
+    const delay = 200;
+
+    clearTimeout(timeoutID);
+    timeoutID = setTimeout(() => {
+
+        const [text, selection] = getTextSelection();
+
+        if (text.length === 0 || selection === null) {
+            isVisible.value = false;
+            return;
+        }
+
+        selectedText.value = text;
+
+        showMenu(selection);
+    }, delay);
+};
+
+function handleGlobalMouseDown() {
+    clearTimeout(timeoutID);
+    isVisible.value = false;
+}
+
+function handleMouseDown(e: MouseEvent) {
+    e.stopPropagation();
+}
+function handleMouseUp(e: MouseEvent) {
+    e.stopPropagation();
+}
 async function handleAction(url: URL) {
     const window: Browser.windows.CreateData = {
         url: url.href,
@@ -144,8 +164,6 @@ async function handleAction(url: URL) {
         data: window
     }).catch(console.error);
 
-    isVisible.value = false;
-
     const isAutoHideSelection = await storage.getItem("local:is_auto_hide_selection", {
         defaultValue: true,
     }).catch(err => err);
@@ -156,21 +174,29 @@ async function handleAction(url: URL) {
     }
 
     if (isAutoHideSelection) {
+        isVisible.value = false;
         getSelection()?.empty();
     }
 };
 
 onMounted(() => {
-    window.addEventListener('mouseup', debounce(handleMouseUp, 200));
+    menuElement.value?.addEventListener('mousedown', handleMouseDown);
+    menuElement.value?.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener('mouseup', handleGlobalMouseUp);
+    window.addEventListener('mousedown', handleGlobalMouseDown);
 });
 
 onUnmounted(() => {
-    window.removeEventListener('mouseup', handleMouseUp);
+    menuElement.value?.removeEventListener('mousedown', handleMouseDown);
+    menuElement.value?.removeEventListener('mouseup', handleMouseUp);
+    window.removeEventListener('mouseup', handleGlobalMouseUp);
+    window.removeEventListener('mousedown', handleGlobalMouseDown);
 });
 </script>
 
 <template>
-    <div id="english-pocket-container" v-if="isVisible" class="floating-menu" :style="{ top: menuStyle.top, left: menuStyle.left }">
+    <div ref="menuElement" id="english-pocket-container" v-show="isVisible" class="floating-menu"
+        :style="{ top: menuStyle.top, left: menuStyle.left }">
         <v-tooltip v-for="(item, index) in buttons" :key="index" :text="item.tooltip" location="bottom">
             <template #activator="{ props }">
                 <v-btn v-bind="props" icon variant="tonal" density="comfortable" @click="handleAction(item.getUrl())">
