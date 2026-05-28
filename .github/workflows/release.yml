@@ -3,8 +3,10 @@ name: Release
 on:
   workflow_dispatch:
   push:
-    branches:
-      - main
+    tags:
+      - "v*.*.*"
+    # branches:
+    #   - main
 
 jobs:
   submit:
@@ -30,9 +32,21 @@ jobs:
           npm run zip
           npm run zip:firefox
 
+      - name: Update package.json version
+        run: |
+          # Extract the tag name (e.g., refs/tags/v1.2.3 -> v1.2.3)
+          VERSION=${GITHUB_REF#refs/tags/}
+          
+          # Strip the leading 'v'
+          VERSION=${VERSION#v}
+          
+          echo "Updating package.json to version: $VERSION"
+          
+          # Use node to cleanly update the package.json file
+          node -e "const fs = require('fs'); const pkg = require('./package.json'); pkg.version = '$VERSION'; fs.writeFileSync('./package.json', JSON.stringify(pkg, null, 2) + '\n');"
+
       - name: Release
         uses: softprops/action-gh-release@v3
-        # if: github.ref_type == 'tag'
         with:
           working_directory: dist
           files: "*.zip"
