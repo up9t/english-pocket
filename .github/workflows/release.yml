@@ -27,11 +27,6 @@ jobs:
       - name: Install dependencies
         run: npm i
 
-      - name: Zip extensions
-        run: |
-          npm run zip
-          npm run zip:firefox
-
       - name: Update package.json version
         run: |
           # Extract the tag name (e.g., refs/tags/v1.2.3 -> v1.2.3)
@@ -44,6 +39,11 @@ jobs:
           
           # Use node to cleanly update the package.json file
           node -e "const fs = require('fs'); const pkg = require('./package.json'); pkg.version = '$VERSION'; fs.writeFileSync('./package.json', JSON.stringify(pkg, null, 2) + '\n');"
+
+      - name: Zip extensions
+        run: |
+          npm run zip
+          npm run zip:firefox
 
       - name: Release
         uses: softprops/action-gh-release@v3
