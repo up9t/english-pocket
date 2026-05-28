@@ -14,21 +14,21 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v6
+      # - name: Setup pnpm
+      #   uses: pnpm/action-setup@v6
 
       - uses: actions/setup-node@v6
         with:
           node-version: 25
-          cache: "pnpm"
+          cache: "npm"
 
       - name: Install dependencies
-        run: pnpm i
+        run: npm i
 
       - name: Zip extensions
         run: |
-          pnpm run zip
-          pnpm run zip:firefox
+          npm run zip
+          npm run zip:firefox
 
       - name: Release
         uses: softprops/action-gh-release@v3
