@@ -7,5 +7,13 @@ export default defineConfig({
   outDir: 'dist',
   manifest: {
     permissions: ["tabs", "storage"],
+    browser_specific_settings: {
+      gecko: {
+        id: "english-pocket@up9t.com",
+        data_collection_permissions: {
+          required: ["none"],
+        },
+      },
+    },
   },
 });
