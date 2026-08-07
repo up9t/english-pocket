@@ -8,6 +8,12 @@ import MerriamIcon from "../../assets/merriam.ico";
 import DictionaryIcon from "../../assets/dictionary.ico";
 import ThesaurusIcon from "../../assets/thesaurus.ico";
 import VocabularyIcon from "../../assets/vocabulary.png";
+import { ButtonGroup } from "../../components/ui/button-group";
+import { Button } from "../../components/ui/button";
+import { TooltipProvider } from "../../components/ui/tooltip";
+import { Tooltip } from "../../components/ui/tooltip";
+import { TooltipTrigger } from "../../components/ui/tooltip";
+import { TooltipContent } from "../../components/ui/tooltip";
 
 const buttons = [
     {
@@ -69,7 +75,7 @@ const buttons = [
         }
     },
 ];
-const menuElement = ref<HTMLDivElement | null>(null);
+const menuElement = ref<HTMLElement | null>(null);
 const isVisible = ref(false);
 const selectedText = ref('');
 const menuStyle = reactive({
@@ -118,7 +124,7 @@ function showMenu(selection: Selection) {
     isVisible.value = true;
 }
 
-let timeoutID: NodeJS.Timeout;
+let timeoutID: number;
 
 function handleGlobalMouseUp() {
     const delay = 200;
@@ -180,30 +186,35 @@ async function handleAction(url: URL) {
 };
 
 onMounted(() => {
-    menuElement.value?.addEventListener('mousedown', handleMouseDown);
-    menuElement.value?.addEventListener('mouseup', handleMouseUp);
     window.addEventListener('mouseup', handleGlobalMouseUp);
     window.addEventListener('mousedown', handleGlobalMouseDown);
 });
 
 onUnmounted(() => {
-    menuElement.value?.removeEventListener('mousedown', handleMouseDown);
-    menuElement.value?.removeEventListener('mouseup', handleMouseUp);
     window.removeEventListener('mouseup', handleGlobalMouseUp);
     window.removeEventListener('mousedown', handleGlobalMouseDown);
 });
 </script>
 
 <template>
-    <div ref="menuElement" id="english-pocket-container" v-show="isVisible" class="floating-menu"
-        :style="{ top: menuStyle.top, left: menuStyle.left }">
-        <v-tooltip v-for="(item, index) in buttons" :key="index" :text="item.tooltip" location="bottom">
-            <template #activator="{ props }">
-                <v-btn v-bind="props" icon variant="tonal" density="comfortable" @click="handleAction(item.getUrl())">
-                    <v-img :src="item.icon" width="24" height="24" />
-                </v-btn>
+    <div ref="menuElement" v-show="isVisible" class="z-99999 floating-menu" :style="{ top: menuStyle.top, left: menuStyle.left }" @mouseup="handleMouseUp"
+        @mousedown="handleMouseDown">
+        <ButtonGroup>
+            <template v-for="(item, index) in buttons" :key="index">
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger>
+                            <Button variant="outline" size="icon" @click="handleAction(item.getUrl())">
+                                <img :src="item.icon" alt="Icon" class="h-6 object-cover" />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent :container="menuElement || undefined">
+                            <p>{{ item.tooltip }}</p>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
             </template>
-        </v-tooltip>
+        </ButtonGroup>
     </div>
 </template>
 
