@@ -6,6 +6,7 @@ export default defineConfig({
   srcDir: 'src',
   outDir: 'dist',
   manifest: {
+    name: "English Pocket",
     permissions: ["tabs", "storage"],
     browser_specific_settings: {
       gecko: {
