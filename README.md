@@ -18,7 +18,6 @@ flowchart TD
 - **entrypoints/content**: The popup menu that you see on the web page.
 - **background**: To access the WebExtension API using WXT, such as creating a new window.
 
-
 ## How to build
 
 ```bash
@@ -30,3 +29,7 @@ npm run build:firefox
 ```
 
 You will see the output in the `dist/` directory.
+
+## Developer Notes
+
+Update the repo with `npm version patch/minor/major` to automatically create a git tag and automatically update the `package.json` version.
