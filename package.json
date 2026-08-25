@@ -13,7 +13,7 @@
     "zip:firefox": "wxt zip -b firefox",
     "compile": "vue-tsc --noEmit",
     "postinstall": "wxt prepare",
-    "lint": "oxlint src/",
+    "lint": "oxlint --vue-plugin src/",
     "format": "oxfmt src/"
   },
   "dependencies": {
