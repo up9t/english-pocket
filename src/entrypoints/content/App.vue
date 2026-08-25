@@ -134,7 +134,7 @@ function showMenu(selection: Selection) {
   isVisible.value = true;
 }
 
-let timeoutID: number;
+let timeoutID: ReturnType<typeof setTimeout>;
 
 function handleGlobalMouseUp() {
   const delay = 200;
