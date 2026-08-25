@@ -3,13 +3,13 @@ import App from "./App.vue";
 import "@/assets/style.css";
 
 export default defineContentScript({
-  matches: ['<all_urls>'],
+  matches: ["<all_urls>"],
   cssInjectionMode: "ui",
   async main(ctx) {
     const ui = await createShadowRootUi(ctx, {
-      name: 'english-pocket',
-      position: 'inline',
-      anchor: 'body',
+      name: "english-pocket",
+      position: "inline",
+      anchor: "body",
       onMount: (container) => {
         const app = createApp(App);
         app.mount(container);
